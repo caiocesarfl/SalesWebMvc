@@ -17,32 +17,34 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-        public List<Seller> FindAll ()
+        public async Task<List<Seller>> FindAllAsync ()
         {
-            return _context.Seller.ToList();
+            return await _context.Seller.ToListAsync();
         }
 
-        public void Insert (Seller seller)
+        public async Task InsertAsync (Seller seller)
         {
-            _context.Add(seller);
-            _context.SaveChanges();
+            await _context.AddAsync(seller);
+            await _context.SaveChangesAsync();
         }
 
-        public Seller FindById (int id)
+        public async Task<Seller> FindByIdAsync (int id)
         {
-            return _context.Seller.Include(seller => seller.Department).FirstOrDefault(seller => seller.Id == id);
+            return await _context.Seller.Include(seller => seller.Department).FirstOrDefaultAsync(seller => seller.Id == id);
         }
         
-        public void Remove (int id)
+        public async Task RemoveAsync (int id)
         {
-            var Seller = _context.Seller.Find(id);
+            var Seller = await _context.Seller.FindAsync(id);
             _context.Seller.Remove(Seller);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Update (Seller seller)
+        public async Task UpdateAsync (Seller seller)
         {
-            if (!_context.Seller.Any(item=>item.Id == seller.Id))
+            bool hasAny = await _context.Seller.AnyAsync(item=>item.Id == seller.Id);
+
+            if (!hasAny)
             {
                 throw new NotFoundException ("Id not found");
             }
